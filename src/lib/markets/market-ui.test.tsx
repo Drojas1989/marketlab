@@ -1,13 +1,26 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
-
-import { MarketBuyPlaceholder } from "@/components/marketlab/market-buy-placeholder";
+import { describe, expect, it, vi } from "vitest";
+import { MarketBuyForm } from "@/components/marketlab/market-buy-form";
 import { MarketCard } from "@/components/marketlab/market-card";
 import { MarketsEmptyState } from "@/components/marketlab/markets-empty-state";
 import { ProbabilityChart } from "@/components/marketlab/probability-chart";
 import { ThemeToggle } from "@/components/marketlab/theme-toggle";
 import { FLAT_SERIES_LABEL } from "@/lib/markets/probability";
 import type { Market } from "@/lib/markets/types";
+
+vi.mock("react", async () => {
+  const actual = await vi.importActual<typeof import("react")>("react");
+
+  return {
+    ...actual,
+    useActionState: () => [null, vi.fn(), false],
+    useEffect: () => {},
+  };
+});
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: vi.fn() }),
+}));
 
 const sampleMarket: Market = {
   id: "market-1",
@@ -56,18 +69,21 @@ describe("market UI rendering", () => {
     expect(html).toContain("<polyline");
   });
 
-  it("disables buying for closed markets", () => {
+  it("shows not-buyable state for closed markets", () => {
     const html = renderToStaticMarkup(
-      <MarketBuyPlaceholder
-        market={{
-          ...sampleMarket,
-          status: "closed",
-        }}
+      <MarketBuyForm
+        marketId="market-1"
+        buyable={false}
+        signedIn
+        balanceCents={10000}
+        yesSharesCents={0}
+        noSharesCents={0}
+        signInHref="/sign-in"
       />,
     );
 
-    expect(html).toContain("not open for new trades");
-    expect(html).toContain("disabled");
+    expect(html).toContain("not open for new fake-money buys");
+    expect(html).not.toContain('name="amount"');
   });
 
   it("renders the theme toggle", () => {

@@ -1,5 +1,17 @@
 export type MarketStatus = "open" | "closed" | "resolved";
 
+export type PositionSide = "yes" | "no";
+
+export type PositionSnapshot = {
+  yes_shares_cents: number;
+  no_shares_cents: number;
+};
+
+export type BuyActionState = {
+  error?: string;
+  success?: string;
+};
+
 export type Market = {
   id: string;
   title: string;
