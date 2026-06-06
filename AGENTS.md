@@ -20,7 +20,13 @@ Do not add dependencies or replace the stack unless asked.
 
 ## Skills and Docs
 
-Use relevant installed skills for framework-specific work.
+Project skills live in `.agents/skills/`. The lockfile `skills-lock.json` records installed sources and versions.
+
+Use relevant installed skills for framework-specific work. To add or update skills:
+
+```bash
+npx skills add <owner/repo@skill> -a cursor -y
+```
 
 For Next.js-specific uncertainty, prefer the installed docs in `node_modules/next/dist/docs/`.
 
@@ -30,6 +36,8 @@ For Next.js-specific uncertainty, prefer the installed docs in `node_modules/nex
 - `src/components/`: reusable UI components
 - `src/lib/`: shared utilities and Supabase clients
 - `supabase/`: migrations, config, and seed data
+- `.agents/skills/`: project agent skills
+- `skills-lock.json`: installed skill sources and hashes
 - `Taskfile.yml`: project commands
 
 ## Commands
