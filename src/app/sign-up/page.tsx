@@ -1,4 +1,5 @@
-import { Header } from "@/components/marketlab/header";
+import { FakeMoneyNote } from "@/components/marketlab/fake-money-note";
+import { PageShell } from "@/components/marketlab/page-shell";
 import { SignUpForm } from "@/components/marketlab/sign-up-form";
 import {
   Card,
@@ -10,21 +11,19 @@ import {
 
 export default function SignUpPage() {
   return (
-    <div className="min-h-svh bg-background text-foreground">
-      <Header />
-      <main className="mx-auto flex max-w-6xl justify-center px-4 py-10 sm:py-16">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Create account</CardTitle>
-            <CardDescription>
-              Start with $100.00 fake money for the workshop markets.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <SignUpForm />
-          </CardContent>
-        </Card>
-      </main>
-    </div>
+    <PageShell mainClassName="flex justify-center py-10 sm:py-16">
+      <Card className="w-full max-w-md border-t-2 border-t-brand/40">
+        <CardHeader>
+          <CardTitle>Create account</CardTitle>
+          <CardDescription>
+            Start with $100.00 fake money for the workshop markets.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <FakeMoneyNote />
+          <SignUpForm />
+        </CardContent>
+      </Card>
+    </PageShell>
   );
 }

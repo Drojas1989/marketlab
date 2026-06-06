@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { PositionsEmptyState } from "@/components/marketlab/positions-empty-state";
+import { PositionsSummary } from "@/components/marketlab/positions-summary";
 import { totalSharesCents } from "@/lib/positions/types";
 
 const samplePosition = {
@@ -38,6 +39,24 @@ describe("positions UI", () => {
     expect(html).toContain("No positions yet");
     expect(html).toContain("Browse markets");
     expect(html).toContain("/markets");
+  });
+
+  it("renders a positions summary row", () => {
+    const html = renderToStaticMarkup(
+      <PositionsSummary
+        marketsHeld={2}
+        totalSharesCents={750}
+        yesExposureCents={500}
+        noExposureCents={250}
+      />,
+    );
+
+    expect(html).toContain("Markets held");
+    expect(html).toContain("Total shares");
+    expect(html).toContain("Yes exposure");
+    expect(html).toContain("No exposure");
+    expect(html).toContain("2");
+    expect(html).toContain("$7.50 fake");
   });
 
   it("computes total shares from yes and no share cents", () => {

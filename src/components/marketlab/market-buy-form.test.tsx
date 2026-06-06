@@ -74,5 +74,6 @@ describe("MarketBuyForm", () => {
     expect(html).toContain('name="amount"');
     expect(html).toContain("Available fake balance");
     expect(html).toContain("Buy fake shares");
+    expect(html).toContain("1 fake cent spent = 1 share cent");
   });
 });
