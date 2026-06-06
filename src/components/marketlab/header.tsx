@@ -1,14 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { HeaderAuth } from "@/components/marketlab/header-auth";
 import { ThemeToggle } from "@/components/marketlab/theme-toggle";
+import { getCurrentUserProfile } from "@/lib/profile/queries";
 import { cn } from "@/lib/utils";
 
 type HeaderProps = {
   className?: string;
 };
 
-export function Header({ className }: HeaderProps) {
+export async function Header({ className }: HeaderProps) {
+  const { user, profile } = await getCurrentUserProfile();
+
   return (
     <header
       className={cn(
@@ -40,7 +44,7 @@ export function Header({ className }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-3">
-          <div data-slot="auth-placeholder" className="hidden sm:block" />
+          <HeaderAuth userId={user?.id ?? null} profile={profile} />
           <ThemeToggle />
         </div>
       </div>
