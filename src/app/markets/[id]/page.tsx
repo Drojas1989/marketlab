@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { formatCloseDate, formatYesChancePercent } from "@/lib/markets/format";
-import { getMarketProbabilityData } from "@/lib/markets/probability";
+import { getMarketProbabilityData } from "@/lib/markets/probability.server";
 import { getMarketById } from "@/lib/markets/queries";
 
 type MarketDetailPageProps = {
