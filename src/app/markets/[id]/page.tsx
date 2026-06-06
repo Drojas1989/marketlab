@@ -1,9 +1,12 @@
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { Header } from "@/components/marketlab/header";
+import { FakeMoneyNote } from "@/components/marketlab/fake-money-note";
 import { MarketBuySection } from "@/components/marketlab/market-buy-section";
 import { MarketStatusBadge } from "@/components/marketlab/market-status-badge";
+import { OutcomeStat } from "@/components/marketlab/outcome-stat";
+import { PageShell } from "@/components/marketlab/page-shell";
 import { ProbabilityChart } from "@/components/marketlab/probability-chart";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,75 +40,72 @@ export default async function MarketDetailPage({
   );
 
   return (
-    <div className="min-h-svh bg-background text-foreground">
-      <Header />
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
-        <div className="mb-6">
-          <Button asChild variant="ghost" size="sm" className="-ml-2">
-            <Link href="/markets">← Back to markets</Link>
-          </Button>
-        </div>
+    <PageShell>
+      <div className="mb-6">
+        <Button asChild variant="ghost" size="sm" className="-ml-2 gap-1.5">
+          <Link href="/markets">
+            <ArrowLeft className="size-4" aria-hidden="true" />
+            Back to markets
+          </Link>
+        </Button>
+      </div>
 
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <div className="space-y-6">
-            <Card>
-              <CardHeader className="gap-3">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <CardTitle className="text-2xl sm:text-3xl">
-                    {market.title}
-                  </CardTitle>
-                  <MarketStatusBadge status={market.status} />
-                </div>
-                <CardDescription className="text-base leading-relaxed">
-                  {market.description ?? "No description provided."}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+        <div className="space-y-6">
+          <Card>
+            <CardHeader className="gap-3">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <CardTitle className="text-2xl sm:text-3xl">
+                  {market.title}
+                </CardTitle>
+                <MarketStatusBadge status={market.status} />
+              </div>
+              <CardDescription className="text-base leading-relaxed">
+                {market.description ?? "No description provided."}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-sm text-muted-foreground">
                 Closes {formatCloseDate(market.close_date)}
-              </CardContent>
-            </Card>
+              </p>
+              <FakeMoneyNote />
+            </CardContent>
+          </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Outcomes</CardTitle>
-                <CardDescription>
-                  Current market sentiment from available position data.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-lg border border-border bg-muted/30 p-4">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Yes
-                  </p>
-                  <p className="mt-1 text-2xl font-semibold">
-                    {formatYesChancePercent(probability.yesChance)}
-                  </p>
-                </div>
-                <div className="rounded-lg border border-border bg-muted/30 p-4">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    No
-                  </p>
-                  <p className="mt-1 text-2xl font-semibold">
-                    {formatYesChancePercent(probability.noChance)}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Outcomes</CardTitle>
+              <CardDescription>
+                Current Yes/No sentiment from available position data.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-3 sm:grid-cols-2">
+              <OutcomeStat
+                side="yes"
+                label="Yes"
+                value={formatYesChancePercent(probability.yesChance)}
+              />
+              <OutcomeStat
+                side="no"
+                label="No"
+                value={formatYesChancePercent(probability.noChance)}
+              />
+            </CardContent>
+          </Card>
 
-            <ProbabilityChart
-              yesChance={probability.yesChance}
-              points={probability.points}
-              seriesMode={probability.seriesMode}
-              seriesLabel={probability.seriesLabel}
-              source={probability.source}
-            />
-          </div>
-
-          <div>
-            <MarketBuySection market={market} />
-          </div>
+          <ProbabilityChart
+            yesChance={probability.yesChance}
+            points={probability.points}
+            seriesMode={probability.seriesMode}
+            seriesLabel={probability.seriesLabel}
+            source={probability.source}
+          />
         </div>
-      </main>
-    </div>
+
+        <div className="lg:sticky lg:top-24">
+          <MarketBuySection market={market} />
+        </div>
+      </div>
+    </PageShell>
   );
 }

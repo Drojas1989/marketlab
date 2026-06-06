@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 
 import { buyMarketShares } from "@/app/actions/buy";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { formatFakeDollars, formatFakeShares } from "@/lib/fake-money";
+import {
+  formatFakeBalanceCents,
+  formatFakeDollars,
+  formatFakeShares,
+  parseFakeDollarInput,
+} from "@/lib/fake-money";
 import type { BuyActionState } from "@/lib/markets/types";
 import { cn } from "@/lib/utils";
 
@@ -39,6 +44,7 @@ export function MarketBuyForm({
   signInHref,
 }: MarketBuyFormProps) {
   const router = useRouter();
+  const [amountInput, setAmountInput] = useState("");
   const [state, action, pending] = useActionState(
     buyMarketShares,
     initialState,
@@ -50,9 +56,11 @@ export function MarketBuyForm({
     }
   }, [router, state?.success]);
 
+  const parsedAmount = parseFakeDollarInput(amountInput);
+
   if (!signedIn) {
     return (
-      <Card>
+      <Card className="border-t-2 border-t-brand/30">
         <CardHeader>
           <CardTitle>Buy fake shares</CardTitle>
           <CardDescription>
@@ -70,7 +78,7 @@ export function MarketBuyForm({
 
   if (!buyable) {
     return (
-      <Card>
+      <Card className="border-t-2 border-t-brand/30">
         <CardHeader>
           <CardTitle>Buy fake shares</CardTitle>
           <CardDescription>
@@ -80,8 +88,12 @@ export function MarketBuyForm({
         <CardContent className="space-y-3 text-sm text-muted-foreground">
           <p>Available fake balance: {formatFakeDollars(balanceCents ?? 0)}</p>
           <div className="grid gap-2 sm:grid-cols-2">
-            <p>Yes shares: {formatFakeShares(yesSharesCents)}</p>
-            <p>No shares: {formatFakeShares(noSharesCents)}</p>
+            <p className="text-yes">
+              Yes shares: {formatFakeShares(yesSharesCents)}
+            </p>
+            <p className="text-no">
+              No shares: {formatFakeShares(noSharesCents)}
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -89,11 +101,11 @@ export function MarketBuyForm({
   }
 
   return (
-    <Card>
+    <Card className="border-t-2 border-t-brand/30">
       <CardHeader>
         <CardTitle>Buy fake shares</CardTitle>
         <CardDescription>
-          Spend fake dollars to add Yes or No shares. One fake cent buys one
+          Spend fake cents to collect Yes or No shares. 1 fake cent spent = 1
           share cent.
         </CardDescription>
       </CardHeader>
@@ -101,8 +113,10 @@ export function MarketBuyForm({
         <form action={action} className="space-y-4">
           <input type="hidden" name="market_id" value={marketId} />
 
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">Choose a side</p>
+          <fieldset className="space-y-2" disabled={pending}>
+            <legend className="text-sm font-medium text-foreground">
+              Choose a side
+            </legend>
             <div className="grid grid-cols-2 gap-2">
               <SideOption
                 id="buy-yes"
@@ -119,7 +133,7 @@ export function MarketBuyForm({
                 disabled={pending}
               />
             </div>
-          </div>
+          </fieldset>
 
           <div className="space-y-2">
             <label
@@ -137,8 +151,25 @@ export function MarketBuyForm({
               placeholder="10.00"
               required
               disabled={pending}
-              className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1 text-sm text-foreground shadow-xs outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30"
+              value={amountInput}
+              onChange={(event) => setAmountInput(event.target.value)}
+              className="field-input"
             />
+            {amountInput.trim() ? (
+              <p
+                className={cn(
+                  "text-sm",
+                  parsedAmount.ok
+                    ? "text-muted-foreground"
+                    : "text-destructive",
+                )}
+                aria-live="polite"
+              >
+                {parsedAmount.ok
+                  ? `You'll receive ${formatFakeBalanceCents(parsedAmount.cents)}.`
+                  : parsedAmount.error}
+              </p>
+            ) : null}
           </div>
 
           <div className="rounded-lg border border-border bg-muted/30 p-3 text-sm">
@@ -149,8 +180,12 @@ export function MarketBuyForm({
               </span>
             </p>
             <div className="mt-2 grid gap-1 sm:grid-cols-2">
-              <p>Your Yes shares: {formatFakeShares(yesSharesCents)}</p>
-              <p>Your No shares: {formatFakeShares(noSharesCents)}</p>
+              <p className="text-yes">
+                Your Yes shares: {formatFakeShares(yesSharesCents)}
+              </p>
+              <p className="text-no">
+                Your No shares: {formatFakeShares(noSharesCents)}
+              </p>
             </div>
           </div>
 
@@ -161,10 +196,7 @@ export function MarketBuyForm({
           ) : null}
 
           {state?.success ? (
-            <p
-              className="text-sm text-emerald-700 dark:text-emerald-300"
-              role="status"
-            >
+            <p className="text-sm text-yes dark:text-yes" role="status">
               {state.success}
             </p>
           ) : null}
@@ -186,12 +218,18 @@ type SideOptionProps = {
   disabled?: boolean;
 };
 
+const sideCheckedStyles: Record<"yes" | "no", string> = {
+  yes: "has-checked:border-yes has-checked:bg-yes-muted/80 has-checked:text-yes dark:has-checked:bg-yes-muted/50",
+  no: "has-checked:border-no has-checked:bg-no-muted/80 has-checked:text-no dark:has-checked:bg-no-muted/50",
+};
+
 function SideOption({ id, name, value, label, disabled }: SideOptionProps) {
   return (
     <label
       htmlFor={id}
       className={cn(
-        "flex cursor-pointer items-center justify-center rounded-lg border border-input px-3 py-2 text-sm font-medium transition-colors has-checked:border-primary has-checked:bg-primary/10",
+        "flex cursor-pointer items-center justify-center rounded-lg border border-input px-3 py-2.5 text-sm font-semibold transition-colors",
+        sideCheckedStyles[value],
         disabled && "cursor-not-allowed opacity-50",
       )}
     >

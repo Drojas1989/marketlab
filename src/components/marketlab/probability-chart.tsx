@@ -157,7 +157,7 @@ export function ProbabilityChart({
                 points={polyline}
                 fill="none"
                 className={cn(
-                  "stroke-primary",
+                  "stroke-brand",
                   seriesMode === "flat" ? "stroke-dasharray-[6_4]" : undefined,
                 )}
                 strokeWidth="2.5"

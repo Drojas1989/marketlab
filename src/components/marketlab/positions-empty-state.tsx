@@ -1,3 +1,4 @@
+import { Briefcase } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -12,14 +13,20 @@ import {
 export function PositionsEmptyState() {
   return (
     <Card className="border-dashed">
-      <CardHeader>
+      <CardHeader className="items-center text-center">
+        <div className="mb-2 flex size-12 items-center justify-center rounded-full bg-muted">
+          <Briefcase
+            className="size-6 text-muted-foreground"
+            aria-hidden="true"
+          />
+        </div>
         <CardTitle>No positions yet</CardTitle>
-        <CardDescription>
+        <CardDescription className="max-w-md">
           Buy Yes or No fake shares from an open market to see your positions
           here.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex justify-center">
         <Button asChild variant="outline">
           <Link href="/markets">Browse markets</Link>
         </Button>
