@@ -33,12 +33,18 @@ export async function Header({ className }: HeaderProps) {
             />
             <span className="sr-only">MarketLab</span>
           </Link>
-          <nav aria-label="Main">
+          <nav aria-label="Main" className="flex items-center gap-4">
             <Link
               href="/markets"
               className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               Markets
+            </Link>
+            <Link
+              href="/positions"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              My Positions
             </Link>
           </nav>
         </div>
